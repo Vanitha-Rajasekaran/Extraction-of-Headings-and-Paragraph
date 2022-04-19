@@ -11,7 +11,6 @@ for page in range(0,len(pdf.pages)):
     txt = text.extract_text()
     content = '\n'.join(el.strip() for el in txt.split('\n') if el.strip())
     content = content.splitlines()
-    #print(content)
     regex = re.compile('[@_!#$%^&;,*()<>?/\,|}{~●]')
     for t in content:
       if t.count(' ')<6 and  regex.search(t) == None and t[-1] != '.' and t[-1].isdigit() == False:
@@ -20,10 +19,11 @@ for page in range(0,len(pdf.pages)):
     data += txt
      
 keyword = input('Enter a keyword : ')
-pos = re.finditer(keyword,data)
-#print(pos)
-
-for p in pos:
+keyword_pos = re.finditer(keyword,data)
+#print(keyword_pos)
+eof = re.search('\Z',data)
+eof = eof.span()
+for p in keyword_pos:
     p = p.span()
     for s in span:
         after = s
@@ -32,5 +32,8 @@ for p in pos:
         before = s   
     #print(before)
     #print(after)
-    para = data[before[0]:after[0]]
+    if before == after:
+      para = data[after[0]:eof[0]]
+    else:
+      para = data[before[0]:after[0]]
     print(para)
