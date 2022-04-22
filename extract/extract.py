@@ -7,6 +7,7 @@ pdf=pdfplumber.open(filename)
 data = ''
 span = []
 heading = []
+flag = 0
 for page in range(0,len(pdf.pages)):
     text = pdf.pages[page]
     txt = text.extract_text()
@@ -34,8 +35,11 @@ for p in keyword_pos:
         before = s   
     #print(before)
     #print(after)
+    if flag == after:
+     continue
     if before == after:
       para = data[after[0]:eof[0]]
     else:
       para = data[before[0]:after[0]]
+     flag = after
     print(para)
