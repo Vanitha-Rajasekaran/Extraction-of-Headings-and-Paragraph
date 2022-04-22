@@ -6,6 +6,7 @@ filename = input("Enter a filename : ")
 pdf=pdfplumber.open(filename)
 data = ''
 span = []
+heading = []
 for page in range(0,len(pdf.pages)):
     text = pdf.pages[page]
     txt = text.extract_text()
@@ -15,9 +16,10 @@ for page in range(0,len(pdf.pages)):
     for t in content:
       if t.count(' ')<6 and  regex.search(t) == None and t[-1] != '.' and t[-1].isdigit() == False:
         print(t)
-        span.append(re.search(t,txt).span())
+        heading.append(t)
     data += txt
-     
+for h in heading :
+ span.append(re.search(h,data).span())
 keyword = input('Enter a keyword : ')
 keyword_pos = re.finditer(keyword,data)
 #print(keyword_pos)
