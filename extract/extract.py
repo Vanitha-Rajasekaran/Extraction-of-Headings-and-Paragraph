@@ -1,45 +1,60 @@
 import pdfplumber
 import re
-import string
  
-filename = input("Enter a filename : ")
-pdf=pdfplumber.open(filename)
-data = ''
-span = []
-heading = []
-flag = 0
-for page in range(0,len(pdf.pages)):
-    text = pdf.pages[page]
-    txt = text.extract_text()
-    content = '\n'.join(el.strip() for el in txt.split('\n') if el.strip())
+def text_extraction(pdf):
+    text=''
+    heading = []
+    for pages in range(0,len(pdf.pages)):
+        page = pdf.pages[pages]
+        text += page.extract_text()
+    return text
+    
+def heading_extraction(text):
+    heading = []
+    content = '\n'.join(el.strip() for el in text.split('\n') if el.strip())
     content = content.splitlines()
-    regex = re.compile('[@_!#$%^&;,*()<>?/\,|}{~●]')
+    regex = re.compile('[@_!#$?;''%^;,*()<>\[\]?/=\,“”"|}{~●•]')
     for t in content:
-      if t.count(' ')<6 and  regex.search(t) == None and t[-1] != '.' and t[-1].isdigit() == False:
-        print(t)
-        heading.append(t)
-    data += txt
-for h in heading :
- span.append(re.search(h,data).span())
-keyword = input('Enter a keyword : ')
-keyword_pos = re.finditer(keyword,data)
-#print(keyword_pos)
-eof = re.search('\Z',data)
-eof = eof.span()
-for p in keyword_pos:
-    p = p.span()
-    for s in span:
-        after = s
-        if s > p:
-            break
-        before = s   
-    #print(before)
-    #print(after)
-    if flag == after:
-     continue
-    if before == after:
-      para = data[after[0]:eof[0]]
-    else:
-      para = data[before[0]:after[0]]
-     flag = after
-    print(para)
+        if t.count(' ')<6 and  regex.search(t) == None and t[-1] != '.' and t[-1].isdigit() == False:
+            heading.append(t)
+    return heading
+    
+def span_of_heading(heading,text):
+    span = []
+    for h in heading:
+        span.append(re.search(h,text).span())
+    return span
+
+def keyword(text):
+    keyword = input('Enter a keyword : ')
+    keyword_pos = re.finditer(keyword,text)
+    return keyword_pos
+    
+def search(keyword_pos,span,text):
+    flag = 0
+    content = ''
+    for p in keyword_pos:
+        p = p.span()
+        for s in span:
+            after = s
+            if s > p:
+                break
+            before = s  
+        if flag == after:
+            continue
+        if before == after:
+            content += text[after[0]:]
+        else:
+            content += text[before[0]:after[0]]
+        flag = after
+    return content
+    
+#main
+filename = input("Enter a filename : ")
+pdf = pdfplumber.open(filename)
+text = text_extraction(pdf)
+heading = heading_extraction(text)
+span = span_of_heading(heading,text)
+keyword_pos = keyword(text)
+content = search(keyword_pos,span,text)
+print(content)
