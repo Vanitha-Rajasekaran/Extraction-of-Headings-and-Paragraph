@@ -43,9 +43,9 @@ def search(keyword_pos,span,text):
         if flag == after:
             continue
         if before == after:
-            content += text[after[0]:]
+            content += '\n'+text[after[0]:]
         else:
-            content += text[before[0]:after[0]]
+            content += '\n'+text[before[0]:after[0]]
         flag = after
     return content
     
